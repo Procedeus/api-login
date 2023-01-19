@@ -11,5 +11,6 @@ routes.delete('/users/:id', UserController.delete);
 routes.post('/update/:id', UserController.update);
 routes.post('/updateGift/:id', UserController.gift);
 routes.post('/updateGifted/:id', UserController.gifted);
+routes.post('/raffle/:verif', UserController.raffle);
 
 module.exports = routes;
