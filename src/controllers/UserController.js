@@ -1,7 +1,28 @@
 const Users = require('../models/UserData');
+const Accounts = require('../models/AccountData');
 
 module.exports = {
 
+    async signin(request, response){
+        const {username, password} = request.body;
+        const account = await Accounts.find({username: username, password: password});
+        return response.json(account);
+    },
+
+    async signup(request, response){
+        const { username, password } = request.body;
+        const account = await Accounts.find({username: username});
+        if(!username || !password){
+            return response.status(402).json({error: "Usuário/Senha não informado."})
+        }
+        else if(account.length)
+            return response.status(403).json({error: "Usuário existente."})
+        const accountCreated = await Accounts.create({
+            username,
+            password,
+        });
+        return response.json(accountCreated);
+    },
     async read(request, response){
         const userList = await Users.find();
         return response.json(userList);
@@ -17,8 +38,7 @@ module.exports = {
         const userCreated = await Users.create({
             name,
             email,
-            gift: '',
-            gifted: ''
+            gift: ''
         });
         return response.json(userCreated);
     },
