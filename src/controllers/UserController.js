@@ -41,5 +41,10 @@ module.exports = {
           } catch (error) {
             res.status(400).json({ error: 'Invalid token' });
           }
+    },
+    async searchUser(req, res){
+        const userId = req.decodedToken.userId;
+        const account = await Accounts.findById(userId);
+        return res.json(account);
     }
 }
