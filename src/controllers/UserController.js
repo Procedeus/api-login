@@ -3,19 +3,18 @@ const jwt = require('jsonwebtoken');
 
 module.exports = {
 
-    async signin(request, response){
+    async login(request, response){
         const {username, password} = request.body;
         const account = await Accounts.find({username: username, password: password});
         if(account.length > 0){
             const secretKey = 'meu-segredo-feito';
             const payload = {
-                userId: account._id,
-                username: account.username
-            }
-            const token = jwt.sign(payload, secretKey, { expiresIn: '1h' });
+                userId: account[0]._id
+            };
+            console.log(payload);
+            const token = jwt.sign(payload, secretKey, { expiresIn: '7d' });
             return response.json({token});
         }
-        return response.status(404).json({error: "Email e/ou senha incorretos"});
     },
     async signup(request, response){
         const { username, password, email } = request.body;
@@ -27,6 +26,20 @@ module.exports = {
             password,
             email
         });
-        return response.json(accountCreated);
+        return login(accountCreated);
+    },
+    verifyToken(req, res, next) {
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ error: 'Token not found' });
+        }
+        const secretKey = 'meu-segredo-feito';
+        try {
+            const decodedToken = jwt.verify(token, secretKey);
+            req.decodedToken = decodedToken;
+            next();
+          } catch (error) {
+            res.status(400).json({ error: 'Invalid token' });
+          }
     }
 }
