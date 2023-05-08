@@ -11,27 +11,29 @@ module.exports = {
             const payload = {
                 userId: account[0]._id
             };
-            console.log(payload);
             const token = jwt.sign(payload, secretKey, { expiresIn: '7d' });
             return response.json({token});
+        }
+        else{
+            response.status(401).json({error: "Usuário e/ou Senha incorretos"})
         }
     },
     async signup(request, response){
         const { username, password, email } = request.body;
         const account = await Accounts.find({username: username});
         if(account.length)
-            return response.status(403).json({error: "Usuário existente."})
+            return response.status(409).json({error: "Usuário existente."})
         const accountCreated = await Accounts.create({
             username,
             password,
             email
         });
-        return login(accountCreated);
+        return response.json(accountCreated);
     },
     verifyToken(req, res, next) {
         const token = req.headers.authorization?.split(' ')[1];
         if (!token) {
-            return res.status(401).json({ error: 'Token not found' });
+            return res.status(401).json({ error: 'Token não encontrado' });
         }
         const secretKey = 'meu-segredo-feito';
         try {
@@ -39,7 +41,7 @@ module.exports = {
             req.decodedToken = decodedToken;
             next();
           } catch (error) {
-            res.status(400).json({ error: 'Invalid token' });
+            res.status(400).json({ error: 'Token Invalido' });
           }
     },
     async searchUser(req, res){
