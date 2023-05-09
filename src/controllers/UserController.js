@@ -35,7 +35,6 @@ module.exports = {
         if (token === 'null') {
             return res.status(401).json({ error: 'Token não encontrado' });
         }
-        console.log(token);
         const secretKey = 'meu-segredo-feito';
         try {
           const decodedToken = jwt.verify(token, secretKey);
@@ -48,6 +47,6 @@ module.exports = {
     async searchUser(req, res){
         const userId = req.decodedToken.userId;
         const account = await Accounts.findById(userId);
-        return res.json(account);
+        return res.json(account.username);
     }
 }
