@@ -32,17 +32,18 @@ module.exports = {
     },
     verifyToken(req, res, next) {
         const token = req.headers.authorization?.split(' ')[1];
-        if (!token) {
+        if (token === 'null') {
             return res.status(401).json({ error: 'Token não encontrado' });
         }
+        console.log(token);
         const secretKey = 'meu-segredo-feito';
         try {
-            const decodedToken = jwt.verify(token, secretKey);
-            req.decodedToken = decodedToken;
-            next();
-          } catch (error) {
-            res.status(400).json({ error: 'Token Invalido' });
-          }
+          const decodedToken = jwt.verify(token, secretKey);
+          req.decodedToken = decodedToken;
+          next();
+        } catch (error) {
+          return res.status(400).json({ error: 'Token Invalido' });
+        }
     },
     async searchUser(req, res){
         const userId = req.decodedToken.userId;
