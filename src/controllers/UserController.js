@@ -1,5 +1,6 @@
 const Accounts = require('../models/AccountData');
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 module.exports = {
 
@@ -7,7 +8,7 @@ module.exports = {
         const {username, password} = request.body;
         const account = await Accounts.find({username: username, password: password});
         if(account.length > 0){
-            const secretKey = 'meu-segredo-feito';
+            const secretKey = process.env.JWT_SECRETKEY;
             const payload = {
                 userId: account[0]._id
             };
@@ -35,7 +36,7 @@ module.exports = {
         if (token === 'null') {
             return res.status(401).json({ error: 'Token não encontrado' });
         }
-        const secretKey = 'meu-segredo-feito';
+        const secretKey = process.env.JWT_SECRETKEY;
         try {
           const decodedToken = jwt.verify(token, secretKey);
           req.decodedToken = decodedToken;
