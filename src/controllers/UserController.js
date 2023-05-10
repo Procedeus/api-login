@@ -17,7 +17,7 @@ module.exports = {
         const account = await Accounts.find({username: username, password: password});
         if(account.length > 0){
             const token = createToken(account[0]._id);
-            return response.json({token});
+            return response.json(token);
         }
         else{
             response.status(401).json({error: "Usuário e/ou Senha incorretos"})
