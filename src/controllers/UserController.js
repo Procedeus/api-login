@@ -3,16 +3,19 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 module.exports = {
-
+    createToken(id){
+        const secretKey = process.env.JWT_SECRETKEY;
+        const payload = {
+            userId: id
+        };
+        const token = jwt.sign(payload, secretKey, { expiresIn: '7d' });
+        return token;
+    },
     async login(request, response){
         const {username, password} = request.body;
         const account = await Accounts.find({username: username, password: password});
         if(account.length > 0){
-            const secretKey = process.env.JWT_SECRETKEY;
-            const payload = {
-                userId: account[0]._id
-            };
-            const token = jwt.sign(payload, secretKey, { expiresIn: '7d' });
+            const token = createToken(account[0]._id);
             return response.json({token});
         }
         else{
@@ -22,14 +25,16 @@ module.exports = {
     async signup(request, response){
         const { username, password, email } = request.body;
         const account = await Accounts.find({username: username});
-        if(account.length)
+        if(account.length){
             return response.status(409).json({error: "Usuário existente."})
+        }
         const accountCreated = await Accounts.create({
             username,
             password,
             email
         });
-        return response.json(accountCreated);
+        const token = createToken(accountCreated._id);
+        return response.json(token);
     },
     verifyToken(req, res, next) {
         const token = req.headers.authorization?.split(' ')[1];
