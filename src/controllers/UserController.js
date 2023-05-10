@@ -2,15 +2,16 @@ const Accounts = require('../models/AccountData');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
+function createToken(id){
+    const secretKey = process.env.JWT_SECRETKEY;
+    const payload = {
+        userId: id
+    };
+    const token = jwt.sign(payload, secretKey, { expiresIn: '7d' });
+    return token;
+}
+
 module.exports = {
-    createToken(id){
-        const secretKey = process.env.JWT_SECRETKEY;
-        const payload = {
-            userId: id
-        };
-        const token = jwt.sign(payload, secretKey, { expiresIn: '7d' });
-        return token;
-    },
     async login(request, response){
         const {username, password} = request.body;
         const account = await Accounts.find({username: username, password: password});
